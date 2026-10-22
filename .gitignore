@@ -1,0 +1,14 @@
+.env
+.env.*
+*.pem
+*.key
+*.p12
+*.pfx
+id_rsa
+credentials.json
+serviceAccount*.json
+*.log
+.DS_Store
+Thumbs.db
+.playwright-mcp/
+*.tmp

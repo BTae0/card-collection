@@ -1,0 +1,181 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#0f3d2e">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="카드함">
+  <title>카드함</title>
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+  <link rel="icon" href="icons/icon-192.png">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header class="top">
+    <div class="top-row">
+      <h1>카드함</h1>
+      <button class="icon-btn" id="btnSettings" aria-label="설정">⚙︎</button>
+    </div>
+    <div class="stats" id="stats"></div>
+    <div class="search-row">
+      <input type="search" id="q" placeholder="선수·팀·세트·번호 검색" autocomplete="off">
+      <select id="sort" aria-label="정렬">
+        <option value="new">최근 등록순</option>
+        <option value="player">선수명순</option>
+        <option value="season">시즌 최신순</option>
+        <option value="value">추정가 높은순</option>
+        <option value="buy">구매가 높은순</option>
+      </select>
+    </div>
+    <div class="chips" id="chips"></div>
+  </header>
+
+  <main>
+    <div class="grid" id="grid"></div>
+    <div class="empty" id="empty" hidden>
+      <p class="empty-title">아직 등록된 카드가 없습니다</p>
+      <p>오른쪽 아래 <b>+</b> 버튼으로 첫 카드를 등록해 보세요.</p>
+    </div>
+  </main>
+
+  <button class="fab" id="btnAdd" aria-label="카드 추가">+</button>
+
+  <!-- 상세 보기 -->
+  <section class="sheet" id="detailSheet" hidden>
+    <div class="sheet-head">
+      <button class="text-btn" data-close>닫기</button>
+      <span class="sheet-title">카드 정보</span>
+      <button class="text-btn primary" id="btnEdit">수정</button>
+    </div>
+    <div class="sheet-body" id="detailBody"></div>
+  </section>
+
+  <!-- 등록·수정 -->
+  <section class="sheet" id="formSheet" hidden>
+    <div class="sheet-head">
+      <button class="text-btn" data-close>취소</button>
+      <span class="sheet-title" id="formTitle">카드 등록</span>
+      <button class="text-btn primary" id="btnSave">저장</button>
+    </div>
+    <form class="sheet-body" id="cardForm" autocomplete="off">
+      <div class="photos">
+        <label class="photo-slot" data-side="front">
+          <img alt="" hidden>
+          <span>앞면 사진</span>
+          <input type="file" accept="image/*" name="front">
+        </label>
+        <label class="photo-slot" data-side="back">
+          <img alt="" hidden>
+          <span>뒷면 사진</span>
+          <input type="file" accept="image/*" name="back">
+        </label>
+      </div>
+
+      <fieldset>
+        <legend>기본 정보</legend>
+        <label>선수명 *<input name="player" required list="dl-player"></label>
+        <div class="two">
+          <label>소속팀<input name="team" list="dl-team"></label>
+          <label>국가<input name="nation" list="dl-nation"></label>
+        </div>
+        <div class="two">
+          <label>시즌<input name="season" placeholder="2025-26" list="dl-season"></label>
+          <label>상태
+            <select name="status">
+              <option>보유</option><option>판매예정</option><option>판매완료</option><option>위시</option>
+            </select>
+          </label>
+        </div>
+      </fieldset>
+
+      <fieldset>
+        <legend>제품 정보</legend>
+        <div class="two">
+          <label>브랜드<input name="brand" placeholder="Panini" list="dl-brand"></label>
+          <label>세트<input name="set" placeholder="Prizm" list="dl-set"></label>
+        </div>
+        <div class="two">
+          <label>카드 번호<input name="cardNo" placeholder="#123"></label>
+          <label>패럴렐<input name="parallel" placeholder="Silver" list="dl-parallel"></label>
+        </div>
+        <label>시리얼 넘버<input name="serial" placeholder="23/99"></label>
+        <div class="toggles">
+          <label class="toggle"><input type="checkbox" name="rookie"><span>루키(RC)</span></label>
+          <label class="toggle"><input type="checkbox" name="auto"><span>사인</span></label>
+          <label class="toggle"><input type="checkbox" name="patch"><span>패치·메모라빌리아</span></label>
+        </div>
+      </fieldset>
+
+      <fieldset>
+        <legend>상태·그레이딩</legend>
+        <div class="two">
+          <label>그레이딩
+            <select name="grader">
+              <option value="">무등급</option><option>PSA</option><option>BGS</option><option>SGC</option><option>CGC</option><option>기타</option>
+            </select>
+          </label>
+          <label>등급<input name="grade" inputmode="decimal" placeholder="10"></label>
+        </div>
+        <label>컨디션 메모<input name="condition" placeholder="모서리 미세 화이트닝 등"></label>
+      </fieldset>
+
+      <fieldset>
+        <legend>거래 정보</legend>
+        <div class="two">
+          <label>구매일<input name="buyDate" type="date"></label>
+          <label>구매처<input name="buyFrom" list="dl-buyFrom"></label>
+        </div>
+        <div class="two">
+          <label>구매가(원)<input name="buyPrice" inputmode="numeric"></label>
+          <label>추정 시세(원)<input name="value" inputmode="numeric"></label>
+        </div>
+      </fieldset>
+
+      <fieldset>
+        <legend>보관·메모</legend>
+        <label>보관 위치<input name="location" placeholder="바인더1 3p" list="dl-location"></label>
+        <label>메모<textarea name="memo" rows="3"></textarea></label>
+      </fieldset>
+
+      <button type="button" class="danger-btn" id="btnDelete" hidden>이 카드 삭제</button>
+    </form>
+  </section>
+
+  <!-- 설정 -->
+  <section class="sheet" id="settingsSheet" hidden>
+    <div class="sheet-head">
+      <button class="text-btn" data-close>닫기</button>
+      <span class="sheet-title">설정·백업</span>
+      <span class="text-btn"></span>
+    </div>
+    <div class="sheet-body">
+      <div class="panel">
+        <h3>백업</h3>
+        <p class="muted">카드 정보와 사진은 이 휴대폰 안에만 저장됩니다. 휴대폰을 바꾸거나 브라우저 데이터를 지우기 전에 꼭 백업 파일을 내보내세요.</p>
+        <button class="wide-btn" id="btnExport">백업 파일 내보내기(사진 포함)</button>
+        <label class="wide-btn secondary">백업 파일 불러오기
+          <input type="file" accept=".json,application/json" id="importFile" hidden>
+        </label>
+        <button class="wide-btn secondary" id="btnCsv">엑셀용 CSV 내보내기</button>
+      </div>
+      <div class="panel">
+        <h3>저장 공간</h3>
+        <p class="muted" id="storageInfo">확인 중…</p>
+      </div>
+      <div class="panel">
+        <h3>홈 화면에 설치</h3>
+        <p class="muted">Safari 하단의 공유 버튼 → <b>홈 화면에 추가</b>를 누르면 앱처럼 쓸 수 있습니다. 홈 화면에서 실행해야 데이터가 오래 안전하게 보관됩니다.</p>
+      </div>
+    </div>
+  </section>
+
+  <div class="toast" id="toast" hidden></div>
+  <div id="datalists"></div>
+
+  <script src="app.js"></script>
+</body>
+</html>
